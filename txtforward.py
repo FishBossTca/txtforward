@@ -73,7 +73,7 @@ def forward_traffic(local_port, target_ip, target_port):
 def main():
     import sys
     if len(sys.argv) != 3:
-        print("用法:txtfoward.exe <本地端口> <域名>")
+        print(f"用法: {sys.argv[0]} <本地端口> <域名>")
         return
     
     local_port = int(sys.argv[1])
