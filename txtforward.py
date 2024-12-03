@@ -85,8 +85,6 @@ def main():
         forward_traffic(local_port, target_ip, target_port)
     except KeyboardInterrupt:
         print("\n程序已终止")
-    except Exception as e:
-        print(f"错误: {e}")
 
 if __name__ == "__main__":
     main()
