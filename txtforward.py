@@ -2,7 +2,7 @@ import socket
 import threading
 import dns.resolver
 
-#解析域名的 TXT 记录，并提取其中的 IP 和端口号。返回 (ip, port)，如果解析失败，抛出异常。
+# 解析域名的 TXT 记录
 def resolve_txt_record(domain):
     try:
         answers = dns.resolver.resolve(domain, 'TXT')
@@ -19,74 +19,89 @@ def resolve_txt_record(domain):
     except Exception as e:
         raise ValueError(f"域名解析失败: {e}")
 
-#转发数据流
-def relay(src, dst):
+# TCP 转发逻辑
+def tcp_relay(src, dst):
     try:
         while True:
             data = src.recv(4096)
             if not data:
-                print("连接已关闭")
-                break  # 对端关闭连接
+                break
             dst.sendall(data)
     except Exception as e:
-        print(f"转发数据时出错: {e}")
+        print(f"TCP 转发时出错: {e}")
     finally:
         src.close()
         dst.close()
 
-#处理客户端连接并转发流量到目标地址。
-def handle_client(client_socket, target_ip, target_port):
+def handle_tcp_client(client_socket, target_ip, target_port):
     try:
         target = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         target.connect((target_ip, target_port))
-        print(f"客户端 {client_socket.getpeername()} 已连接，正在转发到 {target_ip}:{target_port}")
+        print(f"TCP 客户端 {client_socket.getpeername()} 已连接，转发到 {target_ip}:{target_port}")
         
-        # 创建线程转发数据
-        thread1 = threading.Thread(target=relay, args=(client_socket, target))
-        thread2 = threading.Thread(target=relay, args=(target, client_socket))
+        thread1 = threading.Thread(target=tcp_relay, args=(client_socket, target))
+        thread2 = threading.Thread(target=tcp_relay, args=(target, client_socket))
         thread1.start()
         thread2.start()
-
-        # 等待线程完成
         thread1.join()
         thread2.join()
     except Exception as e:
-        print(f"处理客户端时出错: {e}")
+        print(f"处理 TCP 客户端时出错: {e}")
     finally:
         client_socket.close()
-        target.close()
 
-#启动端口转发服务。
-def forward_traffic(local_port, target_ip, target_port):
+def start_tcp_forward(local_port, target_ip, target_port):
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.bind(('0.0.0.0', local_port))
+    server.listen(5)
+    print(f"TCP 转发服务已启动，监听 {local_port}，目标 {target_ip}:{target_port}")
     try:
-        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server.bind(('0.0.0.0', local_port))#如果要修改监听地址就改这里
-        server.listen(5)
-        print(f"转发服务已启动，监听本地端口 {local_port}，目标 {target_ip}:{target_port}")
-
         while True:
-            client_sock, addr = server.accept()
-            threading.Thread(target=handle_client, args=(client_sock, target_ip, target_port)).start()
+            client_socket, addr = server.accept()
+            threading.Thread(target=handle_tcp_client, args=(client_socket, target_ip, target_port)).start()
     except Exception as e:
-        print(f"启动转发服务时出错: {e}")
+        print(f"TCP 服务启动失败: {e}")
+    finally:
+        server.close()
 
+# UDP 转发逻辑
+def start_udp_forward(local_port, target_ip, target_port):
+    server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    server.bind(('0.0.0.0', local_port))
+    print(f"UDP 转发服务已启动，监听 {local_port}，目标 {target_ip}:{target_port}")
+    try:
+        while True:
+            data, addr = server.recvfrom(4096)
+            print(f"收到来自 {addr} 的数据")
+            server.sendto(data, (target_ip, target_port))
+    except Exception as e:
+        print(f"UDP 服务启动失败: {e}")
+    finally:
+        server.close()
+
+# 主函数
 def main():
     import sys
-    if len(sys.argv) != 3:
-        print(f"用法: {sys.argv[0]} <本地端口> <域名>")
+    if len(sys.argv) != 4:
+        print(f"用法: {sys.argv[0]} <本地端口> <域名> <协议(tcp/udp/both)>")
         return
-    
+
     local_port = int(sys.argv[1])
     domain = sys.argv[2]
-    
+    protocol = sys.argv[3].lower()
+
     try:
         target_ip, target_port = resolve_txt_record(domain)
         print(f"解析成功: {target_ip}:{target_port}")
-        forward_traffic(local_port, target_ip, target_port)
+
+        if protocol in ['tcp', 'both']:
+            threading.Thread(target=start_tcp_forward, args=(local_port, target_ip, target_port)).start()
+        if protocol in ['udp', 'both']:
+            threading.Thread(target=start_udp_forward, args=(local_port, target_ip, target_port)).start()
     except KeyboardInterrupt:
-        print("\n程序已终止")
+        print("\n程序已终止")   
+    except Exception as e:
+        print(f"程序出错: {e}")
 
 if __name__ == "__main__":
     main()
-
-
