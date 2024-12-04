@@ -10,6 +10,9 @@ class TxtForward:
 
     #解析域名的 TXT 记录，并提取其中的 IP 和端口号。返回 (ip, port)，如果解析失败，抛出异常。
     def resolve_txt_record(self):
+        if self.domain=="www.example.com":
+            print("请使用 -d 参数指定域名，或者修改配置文件默认域名", file=sys.stderr)
+            sys.exit(1)
         IP_PORT_REGEX = re.compile(r"^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):(\d{1,5})$")  # ip:port的正则表达式
         try:
             answers = dns.resolver.resolve(self.domain, 'TXT', lifetime=5)  # 设置超时时间为 5 秒
