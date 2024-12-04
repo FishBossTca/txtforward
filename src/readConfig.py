@@ -6,45 +6,59 @@ import sys
 DEFAULT_CONFIG_FILE = "txtforward.conf"  # 配置文件位置
 required_fields = ['port', 'domain', 'protocol']  # 配置文本字段检查
 
-#命令行配置加载
+# 命令行配置加载
 class Cli_ConfigLoader:
-    def __init__(self, config_file=None):
-        self.config_file = config_file or DEFAULT_CONFIG_FILE
-        self.config_params = {}
-        self.args = None
-
-    #读取配置文件并返回字典形式的参数
-    def read_or_create_config(self):
+    # 读取配置文件并返回字典形式的参数
+    def read_or_create_config(self, config_file=None):
         config = configparser.ConfigParser()
+        # 如果传入了 config_file 参数，则使用它，否则使用默认配置文件
+        if config_file is None:
+            config_file = DEFAULT_CONFIG_FILE  # 使用默认配置文件路径
 
-        # 如果文件不存在，创建并写入默认值
-        if not os.path.exists(self.config_file):
-            print(f"配置文件 {self.config_file} 不存在，正在创建默认配置...")
-            config['DEFAULT'] = {
-                'port': '6666',
-                'domain': 'www.example.com',
-                'protocol': 'tcp'
+        # 写入配置文件
+        try:
+            if not os.path.exists(config_file):
+                print(f"配置文件 {config_file} 不存在，正在创建默认配置...")
+                config['DEFAULT'] = {
+                    'port': '6666',
+                    'domain': 'www.example.com',
+                    'protocol': 'tcp'
+                }
+                try:
+                    with open(config_file, 'w') as configfile:
+                        config.write(configfile)
+                    print(f"默认配置已写入 {config_file}，请编辑 {config_file} 或使用命令行选项覆盖参数")
+                    sys.exit(1)  # 创建配置文件后退出
+                except IOError as e:
+                    print(f"写入配置文件 {config_file} 时发生错误: {e}")
+                    sys.exit(1)  # 写入失败退出
+        except Exception as e:
+            print(f"检查配置文件时发生未预期的错误: {e}")
+            sys.exit(1)  # 其他错误退出
+
+        # 读取配置文件
+        try:
+            config.read(config_file)
+            self.check_missing_fields(config)
+            self.config_params = {
+                'port': config['DEFAULT'].get('port'),
+                'domain': config['DEFAULT'].get('domain'),
+                'protocol': config['DEFAULT'].get('protocol'),
             }
-            with open(self.config_file, 'w') as configfile:
-                config.write(configfile)
-            print(f"默认配置已写入 {self.config_file}，请编辑{self.config_file}或者使用命令行选项覆写参数")
-            sys.exit(1)
+        except configparser.Error as e:
+            print(f"解析配置文件 {config_file} 时发生错误: {e}")
+            sys.exit(1)  # 配置解析失败退出
+        except IOError as e:
+            print(f"读取配置文件 {config_file} 时发生错误: {e}")
+            sys.exit(1)  # 文件读取失败退出
 
-        config.read(self.config_file)
-        self.check_missing_fields(config)
-        self.config_params = {
-            'port': config['DEFAULT'].get('port'),
-            'domain': config['DEFAULT'].get('domain'),
-            'protocol': config['DEFAULT'].get('protocol'),
-        }
-
-    #检查是否缺少字段
+    # 检查是否缺少字段
     def check_missing_fields(self, config):
         missing_fields = [key for key in required_fields if key not in config['DEFAULT']]
         if missing_fields:
             print(f"配置文件缺少以下字段: {', '.join(missing_fields)}")
 
-    #解析命令行参数
+    # 解析命令行参数
     def parse_arguments(self):
         parser = argparse.ArgumentParser(description="TXT解析转发")
 
@@ -64,13 +78,14 @@ class Cli_ConfigLoader:
         # 解析参数
         self.args = parser.parse_args()
 
-    #从命令行和配置文件加载参数，并优先使用命令行参数覆盖配置文件
+    # 从命令行和配置文件加载参数，并优先使用命令行参数覆盖配置文件
     def load_parameters(self):
         self.parse_arguments()  # 获取原始 argparse.Namespace 对象
 
-        # 如果指定了配置文件，优先读取它
         try:
-            self.read_or_create_config()
+            # 如果传入了 --file 参数，优先使用该文件，否则使用默认配置文件
+            config_file = self.args.file if self.args.file else None
+            self.read_or_create_config(config_file)  # 如果指定了配置文件，优先读取它
         except Exception as e:
             print(f"读取配置文件出错: {e}")
             self.config_params = {}
