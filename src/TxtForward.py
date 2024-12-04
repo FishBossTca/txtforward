@@ -1,7 +1,7 @@
 import re
 import sys
 import dns.resolver
-from .Forwarder import TcpForwarder
+from Forwarder import TcpForwarder
 class TxtForward:
     def __init__(self,localport: int = 6666,domain: str = "www.example.com",protocol: str = "tcp",) -> None:
         self.localport = localport

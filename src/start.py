@@ -1,6 +1,5 @@
-from src.TxtForward import TxtForward
-from src.readConfig import Cli_ConfigLoader
-from src.Forwarder import TcpForwarder
+from TxtForward import TxtForward
+from readConfig import Cli_ConfigLoader
 
 def main():
     #命令行解析参数

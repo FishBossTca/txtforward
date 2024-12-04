@@ -46,7 +46,7 @@ class Cli_ConfigLoader:
 
     #解析命令行参数
     def parse_arguments(self):
-        parser = argparse.ArgumentParser(description="TCP/UDP 转发程序")
+        parser = argparse.ArgumentParser(description="TXT解析转发")
 
         # TCP/UDP互斥参数组
         protocol_group = parser.add_mutually_exclusive_group()
