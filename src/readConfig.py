@@ -70,13 +70,12 @@ class Cli_ConfigLoader:
         parser.add_argument('-p', '--port', type=int, help="本地监听端口")
         parser.add_argument('-d', '--domain', type=str, help="目标域名")
         parser.add_argument('--protocol', type=str, choices=['tcp', 'udp'], help="协议类型 (tcp/udp)")
-        parser.add_argument('-c', '--config', type=str, default='DEFAULT', help="指定配置段名称 (默认是 'DEFAULT')")
 
         protocol_group.add_argument('-t', '--tcp', action='store_true', help="使用TCP协议 (默认)")
         protocol_group.add_argument('-u', '--udp', action='store_true', help="使用UDP协议")
-
+        
         parser.add_argument('-f', '--file', type=str, help="指定配置文件")
-
+        parser.add_argument('-c', '--config', type=str, default='DEFAULT', help="指定配置段名称 (默认是 'DEFAULT')")
         # 解析参数
         self.args = parser.parse_args()
 
@@ -91,10 +90,7 @@ class Cli_ConfigLoader:
             config_section = self.args.config
             self.read_or_create_config(config_file, config_section)  # 如果指定了配置文件，优先读取它
         except Exception as e:
-            print(f"读取配置文件出错[vnt]
-port = 8888
-domain = vnta.ytca.top
-protocol = tcp: {e}")
+            print(f"读取配置文件出错: {e}")
             self.config_params = {}
 
         # 优先级：命令行选项参数 > 配置文件参数
