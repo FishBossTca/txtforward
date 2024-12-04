@@ -9,8 +9,9 @@ required_fields = ['port', 'domain', 'protocol']  # 配置文本字段检查
 # 命令行配置加载
 class Cli_ConfigLoader:
     # 读取配置文件并返回字典形式的参数
-    def read_or_create_config(self, config_file=None):
+    def read_or_create_config(self, config_file=None, config_section='DEFAULT'):
         config = configparser.ConfigParser()
+        
         # 如果传入了 config_file 参数，则使用它，否则使用默认配置文件
         if config_file is None:
             config_file = DEFAULT_CONFIG_FILE  # 使用默认配置文件路径
@@ -39,11 +40,11 @@ class Cli_ConfigLoader:
         # 读取配置文件
         try:
             config.read(config_file)
-            self.check_missing_fields(config)
+            self.check_missing_fields(config, config_section)
             self.config_params = {
-                'port': config['DEFAULT'].get('port'),
-                'domain': config['DEFAULT'].get('domain'),
-                'protocol': config['DEFAULT'].get('protocol'),
+                'port': config[config_section].get('port'),
+                'domain': config[config_section].get('domain'),
+                'protocol': config[config_section].get('protocol'),
             }
         except configparser.Error as e:
             print(f"解析配置文件 {config_file} 时发生错误: {e}")
@@ -53,10 +54,10 @@ class Cli_ConfigLoader:
             sys.exit(1)  # 文件读取失败退出
 
     # 检查是否缺少字段
-    def check_missing_fields(self, config):
-        missing_fields = [key for key in required_fields if key not in config['DEFAULT']]
+    def check_missing_fields(self, config, config_section):
+        missing_fields = [key for key in required_fields if key not in config[config_section]]
         if missing_fields:
-            print(f"配置文件缺少以下字段: {', '.join(missing_fields)}")
+            print(f"配置文件 [{config_section}] 缺少以下字段: {', '.join(missing_fields)}")
 
     # 解析命令行参数
     def parse_arguments(self):
@@ -69,6 +70,7 @@ class Cli_ConfigLoader:
         parser.add_argument('-p', '--port', type=int, help="本地监听端口")
         parser.add_argument('-d', '--domain', type=str, help="目标域名")
         parser.add_argument('--protocol', type=str, choices=['tcp', 'udp'], help="协议类型 (tcp/udp)")
+        parser.add_argument('-c', '--config', type=str, default='DEFAULT', help="指定配置段名称 (默认是 'DEFAULT')")
 
         protocol_group.add_argument('-t', '--tcp', action='store_true', help="使用TCP协议 (默认)")
         protocol_group.add_argument('-u', '--udp', action='store_true', help="使用UDP协议")
@@ -85,9 +87,14 @@ class Cli_ConfigLoader:
         try:
             # 如果传入了 --file 参数，优先使用该文件，否则使用默认配置文件
             config_file = self.args.file if self.args.file else None
-            self.read_or_create_config(config_file)  # 如果指定了配置文件，优先读取它
+            # 使用传入的配置段名称
+            config_section = self.args.config
+            self.read_or_create_config(config_file, config_section)  # 如果指定了配置文件，优先读取它
         except Exception as e:
-            print(f"读取配置文件出错: {e}")
+            print(f"读取配置文件出错[vnt]
+port = 8888
+domain = vnta.ytca.top
+protocol = tcp: {e}")
             self.config_params = {}
 
         # 优先级：命令行选项参数 > 配置文件参数
