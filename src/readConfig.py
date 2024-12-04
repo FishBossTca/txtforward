@@ -3,7 +3,7 @@ import os
 import argparse
 import sys
 
-DEFAULT_CONFIG_FILE = "src/txtforward.conf"  # 配置文件位置
+DEFAULT_CONFIG_FILE = "txtforward.conf"  # 配置文件位置
 required_fields = ['port', 'domain', 'protocol']  # 配置文本字段检查
 
 #命令行配置加载
@@ -102,6 +102,3 @@ class Cli_ConfigLoader:
         
         port = int(port)
         return port, domain, protocol
-
-
-
