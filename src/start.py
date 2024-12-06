@@ -1,4 +1,4 @@
-from TxtForward import TxtForward
+from TXTResolve import TXTResolve
 from readConfig import Cli_ConfigLoader
 
 def main():
@@ -8,7 +8,7 @@ def main():
     print(f"当前配置:本地端口号:{port},域名:{domain},协议:{protocol}")
 
     #txt直接转发
-    txtForward=TxtForward(port,domain,protocol)
+    txtForward=TXTResolve(port,domain,protocol)
     txtForward.start()
 
 if __name__ == "__main__":
