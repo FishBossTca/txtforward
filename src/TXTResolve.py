@@ -46,7 +46,7 @@ class TXTResolve:
             print(f"获取远程 IP 和端口号失败: {e}", file=sys.stderr)
             sys.exit(1)
 
-    #直接转发
+"""     #直接转发
     def start(self):
         try:
             target_ip, target_port = self.resolve_txt_record()
@@ -56,4 +56,4 @@ class TXTResolve:
                 print("UDP暂不支持")
                 sys.exit(1)
         except KeyboardInterrupt:
-            print("\n程序已终止")
+            print("\n程序已终止") """
