@@ -83,8 +83,8 @@ python ./start.py -d domain
 ```
 如果要编译二进制文件，可以使用pyinstaller来编译python源码
 #### 依赖项
-请确保安装了pyinstaller的pip包
-```pip install pyinstaller```
+请确保安装了dnspython和pyinstaller的pip包
+```pip install dnspython pyinstaller```
 如果没有虚拟环境请先创建虚拟环境再安装pyinstaller
 - Linux
 ```
