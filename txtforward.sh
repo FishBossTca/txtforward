@@ -25,7 +25,6 @@ is_valid_ip() {
         done
         return 0
     fi
-    return 1
 }
 
 # 校验端口号格式
@@ -106,13 +105,6 @@ main() {
     DOMAIN="$DEFAULT_DOMAIN"
 
     # 如果默认域名未修改，提示用户修改配置文件并退出
-    if [[ "$DEFAULT_DOMAIN" == "www.example.com" ]]; then
-        show_help
-        echo ""
-        echo "错误: 您需要配置默认域名 (DEFAULT_DOMAIN)。请修改脚本中的默认值或通过参数指定域名。" >&2
-
-        exit 1
-    fi
 
     # 解析选项参数
     while [[ $# -gt 0 ]]; do
@@ -148,6 +140,13 @@ main() {
                 ;;
         esac
     done
+    if [[ "$LOCAL_PORT" == "www.example.com" ]]; then
+        show_help
+        echo ""
+        echo "错误: 您需要配置默认域名 (DEFAULT_DOMAIN)。请修改脚本中的默认值或通过参数指定域名。" >&2
+
+        exit 1
+    fi
 
     # 校验参数
     if ! is_valid_port "$LOCAL_PORT"; then
