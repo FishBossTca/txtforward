@@ -211,6 +211,8 @@ def main():
     if protocol == "tcp":
         forwarder = TCPForwarder(local_port=port, target_ip=target_ip, target_port=target_port)
         forwarder.start()
+    elif protocol=='udp':
+        print("UDP暂未开发")
 
 if __name__ == "__main__":
     main()
