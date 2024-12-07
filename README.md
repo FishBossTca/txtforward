@@ -103,7 +103,11 @@ pyinstaller --onefile start.py
 ## 可用的玩法
 这个小工具一开始的目的是为了解决lucky软件创建的stun端口号动态更新的问题，通过开放本地的一个固定端口，转发到动态更新的端口，从而固定远程的动态端口
 <<<<<<< HEAD
+<<<<<<< HEAD
 有兴趣的话可以去我的博客发出的文章学习一下
+=======
+有兴趣的话可以去我的博客发出的文章学习一下[点我打开](https://www.ytca.top/guidance/openwrt/1258/)
+>>>>>>> refs/remotes/origin/main
 # 注意
 当前只支持TCP连接，如果想使用UDP或者TCP/UDP双连接的话还要等后续开发
 =======
