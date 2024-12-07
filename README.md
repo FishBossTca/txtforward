@@ -17,16 +17,44 @@
 ```txtfoward-linux-amd64 -d 域名```
 
 ### 更多参数
-使用方法可以输入```./txtfoward -h```查看  
-  -h, --help                  show this help message and exit
-  -p PORT, --port PORT        本地监听端口
-  -d DOMAIN, --domain DOMAIN  目标域名
-  --protocol {tcp,udp}        协议类型 (tcp/udp)
-  -t, --tcp                   使用TCP协议 (默认)
-  -u, --udp                   使用UDP协议  -f FILE, --file FILE  指定配置文件
+使用方法可以输入```./txtfoward -h```查看 
+``` 
+options:
+  -h, --help            show this help message and exit  
+  -p PORT, --port PORT  本地监听端口  
+  -d DOMAIN, --domain DOMAIN  目标域名  
+  --protocol {tcp,udp}  协议类型 (tcp/udp)  
+  -t, --tcp             使用TCP协议 (默认)  
+  -u, --udp             使用UDP协议#(暂未开发)  
+  -f FILE, --file FILE  指定配置文件  
+  -c CONFIG, --config CONFIG  指定配置段名称 (默认是 'DEFAULT')  
+```
+
+## 配置
+程序在第一次启动的时候默认创建一个txtforward.conf的文件，默认直接启动的话会先读取里面的配置进行转发，如果传入命令行参数则会复写默认配置
+``` 
+[DEFAULT]
+port = 6666
+domain = www.example.com
+protocol = tcp
+```
+配置文件支持使用指定配置段，默认是使用DEFAULT段，如果你有多个TXT解析记录，则使用```-c 配置段```来选取指定配置段
+``` 
+#这个是默认配置段，可以修改
+[DEFAULT]
+port = 6666
+domain = www.example.com
+protocol = tcp
+
+#用户创建配置段，需要手动指定
+[user]
+port = 7777
+domain = www.a.com
+protocol = tcp
+```
 
 
-###  Linux-ShellSript
+##  Linux-ShellSript
 Linux有shellscript版本，是借助socat和dig来实现
 #### 依赖项
 需要安装在使用脚本之前请先确认是否可以使用socat和dig命令
@@ -55,8 +83,8 @@ python ./start.py -d domain
 ```
 如果要编译二进制文件，可以使用pyinstaller来编译python源码
 #### 依赖项
-请确保安装了dnspython和pyinstaller的pip包
-```pip install dnspython pyinstaller```
+请确保安装了pyinstaller的pip包
+```pip install pyinstaller```
 如果没有虚拟环境请先创建虚拟环境再安装pyinstaller
 - Linux
 ```
@@ -75,3 +103,8 @@ pyinstaller --onefile start.py
 ## 可用的玩法
 这个小工具一开始的目的是为了解决lucky软件创建的stun端口号动态更新的问题，通过开放本地的一个固定端口，转发到动态更新的端口，从而固定远程的动态端口
 有兴趣的话可以去我的博客发出的文章学习一下[点我打开](https://www.ytca.top/guidance/openwrt/1258/)
+
+# 待定
+UDP的转发模式  
+创建多个转发类型  
+图形化  
