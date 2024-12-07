@@ -25,7 +25,6 @@ is_valid_ip() {
         done
         return 0
     fi
-    return 1
 }
 
 # 校验端口号格式
