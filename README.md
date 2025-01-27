@@ -95,7 +95,7 @@ source ./python-venv/bin/active
 ```
 git clone https://github.com/FishBossTca/txtforward.git
 cd txtforward
-pyinstaller --onefile start.py
+pyinstaller --onefile txtforward.py
 ```
 编译完成后会生成dist文件夹，里面的txtfoward就是二进制的可执行文件了
 如果编译文件较大的话请单独创建一个新的虚拟环境，只安装程序启动必要的包
