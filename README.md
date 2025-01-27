@@ -86,6 +86,11 @@ python ./start.py -d domain
 请确保安装了dnspython和pyinstaller的pip包
 ```pip install dnspython pyinstaller```
 如果没有虚拟环境请先创建虚拟环境再安装pyinstaller
+- Windows  
+```  
+python -m venv python-venv
+python-venv/script/activate
+```  
 - Linux
 ```
 python -m venv python-venv
