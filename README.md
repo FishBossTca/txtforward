@@ -112,3 +112,4 @@ pyinstaller --onefile txtforward.py
 - 创建多个转发类型  
 - 图形化  
 - 移动端
+如果有需求再催催我吧
